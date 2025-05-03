@@ -1,10 +1,10 @@
-# mujoco_ros2_control
+# quadruped_skate_mpc
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Overview
 
-This repository contains a ROS2 control package for Mujoco simulation, offering the `MujocoSystem` plugin to integrate `ros2_control` with Mujoco. Additionally, it includes a node responsible for initializing the plugin, Mujoco rendering, and the simulation.
+This repository contains a ROS2 control package for Unitree A1 in Mujoco simulation.
 
 ## Installation Guide
 
@@ -19,35 +19,20 @@ Make sure you have the following software installed if you are running on the lo
 
 ### Package Install
 
-Before build this package configure environment variable for mujoco directory.
+You can now install the package using the following commands.
 
 ```bash
-export MUJOCO_DIR=/PATH/TO/MUJOCO/mujoco-3.x.x
-```
-
-You can now compile the package using the following commands.
-
-```bash
-cd mujoco_ros2_control
+git clone https://github.com/LizaP9/quadruped_skate_mpc.git
+cd quadruped_skate_mpc
 source /opt/ros/${ROS_DISTRO}/setup.bash
 colcon build
+source install/setup.bash
 ```
 
 ## Usage
 
-See the [documentation](doc/index.rst) for usage.
+To launch Mujoco simulation with Unitree A1.
 
-## Docker
-
-A basic containerized workflow is provided to test this package in isolation.
-For more information refer to the [docker documentation](docker/RUNNING_IN_DOCKER.md).
-
-## Future Work
-
-Here are several potential areas for future improvement:
-
-1. **Sensors:** Implement IMU sensors, and range sensors.
-
-2. **Loading Model From URDF:** Implement direct loading of models from URDF, eliminating the need to convert URDF files to XML.
-
-Feel free to suggest ideas for new features or improvements.
+```bash
+ros2 launch quadruped_skate_mpc a1_mujoco.launch.py
+```
