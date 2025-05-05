@@ -19,6 +19,14 @@ def generate_launch_description():
         output='screen'
     )
 
+    foot_trajectory_node = Node(
+        package='quadruped_skate_mpc',
+        executable='foot_trajectory_planner_node',
+        name='foot_trajectory_planner',
+        output='screen'
+    )
+
     return LaunchDescription([
-        mujoco_viewer_process
+        mujoco_viewer_process,
+        foot_trajectory_node
     ])

@@ -12,6 +12,8 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -27,10 +29,38 @@ endif()
 
 install(DIRECTORY
   a1_description
+  include
   launch
   scripts
   src
+  msg
   DESTINATION share/${PROJECT_NAME}
 )
+
+include_directories(include)
+
+add_executable(foot_trajectory_planner_node
+  src/foot_trajectory_planner_node.cpp
+  src/foot_trajectory_planner.cpp
+)
+
+ament_target_dependencies(foot_trajectory_planner_node
+  rclcpp
+  std_msgs
+  geometry_msgs
+)
+
+install(TARGETS
+  foot_trajectory_planner_node
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/States.msg"
+)
+
+ament_export_dependencies(rosidl_default_runtime)
+
 
 ament_package()

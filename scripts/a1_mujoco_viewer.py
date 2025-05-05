@@ -6,15 +6,15 @@ import os
 
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
+from quadruped_skate_mpc.msg import States
 from geometry_msgs.msg import Pose, Twist
 
 
 rclpy.init()
 node = rclpy.create_node('a1_sim_state_publisher')
 
-joint_pub = node.create_publisher(JointState, '/a1/joint_states', 10)
-com_pub = node.create_publisher(Pose, '/a1/com_pose', 10)
+joint_pub = node.create_publisher(States, '/a1/joint_act_states', 10)
+com_pub = node.create_publisher(Pose, '/a1/com_act_state', 10)
 
 
 
@@ -171,11 +171,21 @@ while not glfw.window_should_close(window):
         vel_angvel_trunk = data.qvel[:6].copy()
 
         # JointState msg
-        js = JointState()
-        js.header.stamp = node.get_clock().now().to_msg()
-        js.name = [f"{leg}_{joint}" for leg in ["FR", "FL", "RR", "RL"] for joint in ["hip", "thigh", "calf"]]
-        js.position = q_act.tolist()
-        js.velocity = v_act.tolist()
+        js = States()
+
+        js.t = data.time 
+        js.qj = q_act.tolist()
+        js.vj = v_act.tolist()
+        js.tauj = data.ctrl[:].tolist()
+        # js.tauj = [0.0] * 12
+
+        # quaternion
+        js.imu_orientation = data.qpos[3:7].tolist()
+        js.imu_angular_velocity = data.qvel[3:6].tolist()
+        js.imu_linear_acceleration = data.qacc[:3].tolist()  # или [0,0,0] если нет акселерометра
+
+        # Заглушка для force sensor (позже — из контактов)
+        js.foot_force_sensor = [0.0, 0.0, 0.0, 0.0]
         joint_pub.publish(js)
 
         # CoM Pose msg
