@@ -143,20 +143,27 @@ init_controller(model,data)
 #set the controller
 mj.set_mjcb_control(controller)
 
-hip = 0
+hip_r = 0.0
+hip_l = 0.0
+
+# stance on skate
+# hip_r = 0.17
+# hip_l = -0.17
+
 pitch = 0.9
 knee = -1.8
 
-pos = np.array([0, 0, 0.7])
+pos = np.array([0, 0.0, 0.37])
 quat = np.array([1,0,0,0])
 #euler = np.array([0,0,np.pi/2])
 #quat = ram.bryant2quat(euler)
 
-qleg = np.array([hip,pitch,knee])
+qleg_r = np.array([hip_r,pitch,knee])
+qleg_l = np.array([hip_l,pitch,knee])
 
 
 # position for a1 - first 19 elements
-data.qpos[:19] = np.concatenate((pos,quat,qleg,qleg,qleg,qleg))
+data.qpos[:19] = np.concatenate((pos,quat,qleg_r,qleg_l,qleg_r,qleg_l))
 
 # ctrl = np.array([0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8])
 

@@ -41,7 +41,15 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
 )
 
-include_directories(include)
+include_directories(
+  include
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/States.msg"
+  "msg/FootPosition.msg"
+  DEPENDENCIES std_msgs geometry_msgs
+)
 
 add_executable(foot_trajectory_planner_node
   src/foot_trajectory_planner_node.cpp
@@ -59,10 +67,11 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/States.msg"
+rosidl_target_interfaces(foot_trajectory_planner_node
+  ${PROJECT_NAME} "rosidl_typesupport_cpp"
 )
+
+
 
 ament_export_dependencies(rosidl_default_runtime)
 
