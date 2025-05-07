@@ -147,16 +147,35 @@ hip = 0
 pitch = 0.9
 knee = -1.8
 
-pos = np.array([0, 0, 0.3])
+pos = np.array([0, 0, 0.7])
 quat = np.array([1,0,0,0])
 #euler = np.array([0,0,np.pi/2])
 #quat = ram.bryant2quat(euler)
 
 qleg = np.array([hip,pitch,knee])
-data.qpos = np.concatenate((pos,quat,qleg,qleg,qleg,qleg))
+
+
+# position for a1 - first 19 elements
+data.qpos[:19] = np.concatenate((pos,quat,qleg,qleg,qleg,qleg))
 
 # ctrl = np.array([0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8])
 
+
+# MuJoCo doesn't allow multiple .xml file, so you need to add everything in one .xml.
+# Thus, a1 + skate is consedered as one robot and have combines state and all of it's joints can be controller.
+#  In our case it's "scene.xml". The order to include a1.xml and skate.xml metter to understand the state
+
+# For a1 + skate:
+
+# State:
+# position 1x32 - a1 CoM linear position (3), a1 CoM quaternion (4), a1 joints (motors) (12), 
+# skate CoM linear position (3), skate CoM quaternion (4), skate joints (6)
+
+# velocity 1x30 - a1 CoM linear vel (3), a1 angular vel (3), a1 joint vel (motors) (12), 
+# skate CoM linear vel (3), skate angular vel (3), skate joint vel (6)
+
+
+# control - 1x32 - same as position state for position control
 
 while not glfw.window_should_close(window):
     time_prev = data.time
@@ -165,18 +184,18 @@ while not glfw.window_should_close(window):
     while (data.time - time_prev < 1.0/15.0):
         # mj.mj_step1(model, data)
         # Обновление состояний
-        q_act = data.qpos[7:].copy()
-        v_act = data.qvel[6:].copy()
+        q_act = data.qpos[7:19].copy()
+        v_act = data.qvel[6:18].copy()
         pos_quat_trunk = data.qpos[:7].copy()
         vel_angvel_trunk = data.qvel[:6].copy()
 
-        # JointState msg
+        # a1 JointState msg
         js = States()
 
         js.t = data.time 
         js.qj = q_act.tolist()
         js.vj = v_act.tolist()
-        js.tauj = data.ctrl[:].tolist()
+        js.tauj = data.ctrl[:12].tolist()
         # js.tauj = [0.0] * 12
 
         # quaternion
@@ -188,7 +207,7 @@ while not glfw.window_should_close(window):
         js.foot_force_sensor = [0.0, 0.0, 0.0, 0.0]
         joint_pub.publish(js)
 
-        # CoM Pose msg
+        # a1 CoM Pose msg
         pose = Pose()
         pose.position.x = pos_quat_trunk[0]
         pose.position.y = pos_quat_trunk[1]

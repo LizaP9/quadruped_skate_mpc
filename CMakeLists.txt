@@ -28,7 +28,11 @@ if(BUILD_TESTING)
 endif()
 
 install(DIRECTORY
-  a1_description
+  a1_description/
+  DESTINATION share/${PROJECT_NAME}/a1_description
+)
+
+install(DIRECTORY
   include
   launch
   scripts

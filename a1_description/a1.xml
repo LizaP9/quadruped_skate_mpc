@@ -59,11 +59,11 @@
     <texture type="2d" name="trunk_A1" file="trunk_A1.png"/>
     <material name="carbonfibre" texture="trunk_A1" specular="0" shininess="0.25"/>
 
-    <mesh class="a1" file="calf.obj"/>
-    <mesh class="a1" file="hip.obj"/>
-    <mesh class="a1" file="thigh.obj"/>
-    <mesh class="a1" file="thigh_mirror.obj"/>
-    <mesh class="a1" file="trunk.obj"/>
+    <mesh class="a1" file="assets/calf.obj"/>
+    <mesh class="a1" file="assets/hip.obj"/>
+    <mesh class="a1" file="assets/thigh.obj"/>
+    <mesh class="a1" file="assets/thigh_mirror.obj"/>
+    <mesh class="a1" file="assets/trunk.obj"/>
   </asset>
 
   <worldbody>
