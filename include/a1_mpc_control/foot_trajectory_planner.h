@@ -14,8 +14,13 @@ public:
 private:
     void fsmCallback(const std_msgs::msg::String::SharedPtr msg);
     void publishFootTrajectory();
+    double bezier(double p0, double p1, double p2, double t);
 
     std::string current_state_;
+    std::string last_state_;
+    rclcpp::Time start_time_;
+
+
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr fsm_sub_;
     rclcpp::Publisher<quadruped_skate_mpc::msg::FootPosition>::SharedPtr foot_pub_;

@@ -36,3 +36,10 @@ To launch Mujoco simulation with Unitree A1.
 ```bash
 ros2 launch quadruped_skate_mpc a1_mujoco.launch.py
 ```
+
+To publish state:
+
+```
+ros2 topic pub /a1/fsm std_msgs/msg/String '{data: "PREPARE_PUSH"}'
+```
+
