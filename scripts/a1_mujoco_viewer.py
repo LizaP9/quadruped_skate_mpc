@@ -210,8 +210,24 @@ while not glfw.window_should_close(window):
         js.imu_angular_velocity = data.qvel[3:6].tolist()
         js.imu_linear_acceleration = data.qacc[:3].tolist()  # или [0,0,0] если нет акселерометра
 
-        # Заглушка для force sensor (позже — из контактов)
-        js.foot_force_sensor = [0.0, 0.0, 0.0, 0.0]
+
+        foot_force_sensor = [0.0, 0.0, 0.0, 0.0]
+
+        foot_geom_names = ['FR_foot_geom', 'FL_foot_geom', 'RR_foot_geom', 'RL_foot_geom']
+        foot_geom_ids = [mj.mj_name2id(model, mj.mjtObj.mjOBJ_GEOM, geom_name) for geom_name in foot_geom_names]
+
+        for i in range(data.ncon):
+            contact = data.contact[i]
+            force = np.zeros(6)
+            mj.mj_contactForce(model, data, i, force)
+            
+            # Check if contact involves any foot
+            for j, geom_id in enumerate(foot_geom_ids):
+                if contact.geom1 == geom_id or contact.geom2 == geom_id:
+                    # Use the magnitude of the normal force (z-component)
+                    foot_force_sensor[j] = np.linalg.norm(force[:3])
+        
+        js.foot_force_sensor = foot_force_sensor
         joint_pub.publish(js)
 
         # a1 CoM Pose msg
