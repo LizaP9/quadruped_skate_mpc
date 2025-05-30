@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+#Author: mike4192 https://github.com/mike4192/spotMicro
+#Modified by: lnotspotl
+
 import numpy as np
 from math import sin, cos
 
@@ -53,13 +56,13 @@ def homog_transxyz(dx, dy, dz):
     return trans
 
 
-def homog_transform(dx, dy, dz, alpha, beta, gamma):
+def homog_transform(dx,dy,dz,alpha,beta,gamma):
     """
     Create a homogeneous 4x4 transformation matrix
     """
     rot4x4 = np.eye(4)
-    rot4x4[:3,:3] = rotxyz(alpha, beta, gamma)
-    return np.dot(homog_transxyz(dx, dy, dz), rot4x4)
+    rot4x4[:3,:3] = rotxyz(alpha,beta,gamma)
+    return np.dot(homog_transxyz(dx,dy,dz),rot4x4)
 
 
 def homog_transform_inverse(matrix):
@@ -72,8 +75,9 @@ def homog_transform_inverse(matrix):
                  |___________|___________| 
                  | 0   0   0 |     1     | 
                  -------------------------  
+
     """
-    inverse = matrix.copy()
-    inverse[:3,:3] = inverse[:3,:3].T  # R^T
-    inverse[:3,3] = -np.dot(inverse[:3,:3], matrix[:3,3])  # -R^T * d
+    inverse = matrix
+    inverse[:3,:3] = inverse[:3,:3].T # R^T
+    inverse[:3,3] = -np.dot(inverse[:3,:3],inverse[:3,3]) # -R^T * d
     return inverse

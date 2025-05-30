@@ -12,8 +12,8 @@ class InverseKinematics:
     """
     
     # Default dimensions for A1 robot (in meters)
-    DEFAULT_BODY_DIMENSIONS = [0.2399, 0.14]  # [length, width]
-    DEFAULT_LEG_DIMENSIONS = [0.0838, 0.0, 0.2, 0.2]  # [hip_length, hip_offset, thigh_length, calf_length]
+    DEFAULT_BODY_DIMENSIONS = [0.366, 0.094]
+    DEFAULT_LEG_DIMENSIONS = [0.,0.08505, 0.2, 0.2] 
     
     def __init__(self, body_dimensions=None, leg_dimensions=None):
         """
@@ -71,33 +71,34 @@ class InverseKinematics:
         Returns:
             4x3 array of foot positions in their respective shoulder frames
         """
-        # Convert to homogeneous coordinates (add row of ones)
-        leg_positions_homog = np.vstack([leg_positions.T, np.ones(4)])
+        leg_positions = (np.block([[leg_positions.T],[np.array([1,1,1,1])]])).T
 
-        # Transformation matrix, world => base_link
-        T_w_bl = homog_transform(dx, dy, dz, roll, pitch, yaw)
+        # Transformation matrix, base_link_world => base_link
+        T_blwbl = homog_transform(dx,dy,dz,roll,pitch,yaw)
 
-        # Transformation matrices, world => shoulder joints
-        T_w_FR = np.dot(T_w_bl, homog_transform(+0.5*self.body_length,
-                         -0.5*self.body_width, 0, pi/2, -pi/2, 0))
+        # Transformation matrix, base_link_world => FR1
+        T_blwFR1 = np.dot(T_blwbl, homog_transform(+0.5*self.body_length,
+                          -0.5*self.body_width,0,pi/2,-pi/2,0))
 
-        T_w_FL = np.dot(T_w_bl, homog_transform(+0.5*self.body_length,
-                         +0.5*self.body_width, 0, pi/2, -pi/2, 0))
+        # Transformation matrix, base_link_world => FL1
+        T_blwFL1 = np.dot(T_blwbl, homog_transform(+0.5*self.body_length,
+                          +0.5*self.body_width,0,pi/2,-pi/2,0))
 
-        T_w_RR = np.dot(T_w_bl, homog_transform(-0.5*self.body_length,
-                         -0.5*self.body_width, 0, pi/2, -pi/2, 0))
+        # Transformation matrix, base_link_world => RR1
+        T_blwRR1 = np.dot(T_blwbl, homog_transform(-0.5*self.body_length,
+                          -0.5*self.body_width,0,pi/2,-pi/2,0))
 
-        T_w_RL = np.dot(T_w_bl, homog_transform(-0.5*self.body_length,
-                         +0.5*self.body_width, 0, pi/2, -pi/2, 0))
+        # Transformation matrix, base_link_world => RL1
+        T_blwRL1 = np.dot(T_blwbl, homog_transform(-0.5*self.body_length,
+                          +0.5*self.body_width,0,pi/2,-pi/2,0))
 
-        # Transform foot positions to shoulder frames
-        pos_FR = np.dot(homog_transform_inverse(T_w_FR), leg_positions_homog[:,0])
-        pos_FL = np.dot(homog_transform_inverse(T_w_FL), leg_positions_homog[:,1])
-        pos_RR = np.dot(homog_transform_inverse(T_w_RR), leg_positions_homog[:,2])
-        pos_RL = np.dot(homog_transform_inverse(T_w_RL), leg_positions_homog[:,3])
+        # Local coordinates
+        pos_FR = np.dot(homog_transform_inverse(T_blwFR1),leg_positions[0])
+        pos_FL = np.dot(homog_transform_inverse(T_blwFL1),leg_positions[1])
+        pos_RR = np.dot(homog_transform_inverse(T_blwRR1),leg_positions[2])
+        pos_RL = np.dot(homog_transform_inverse(T_blwRL1),leg_positions[3])
 
-        # Return 4x3 array of positions (drop homogeneous component)
-        return np.array([pos_FR[:3], pos_FL[:3], pos_RR[:3], pos_RL[:3]])
+        return(np.array([pos_FR[:3],pos_FL[:3],pos_RR[:3],pos_RL[:3]]))
 
     def _inverse_kinematics(self, leg_positions, dx, dy, dz, roll, pitch, yaw):
         """
@@ -118,38 +119,68 @@ class InverseKinematics:
         angles = []
 
         # Solve IK for each leg
+        # for i in range(4):
+        #     y = positions[i][0]
+        #     z = positions[i][1]
+        #     x = positions[i][2]
+            
+        #     print(x, y, z)
+
+        #     # Leg-specific sign for hip joint (depends on which side the leg is on)
+        #     leg_sign = (-1)**((i % 2) == 1)  # -1 for FL, RL; +1 for FR, RR
+            
+        #     # Compute hip joint angle (abduction/adduction)
+        #     F = sqrt(x**2 + y**2 - self.l2**2)
+        #     G = F - self.l1
+        #     H = sqrt(G**2 + z**2)
+            
+        #     # Hip joint (abduction/adduction)
+        #     theta1 = -atan2(y, x) - atan2(F, self.l2 * leg_sign)
+ 
+        #     # For the knee, compute angle using law of cosines
+        #     D = (H**2 - self.l3**2 - self.l4**2) / (2 * self.l3 * self.l4)
+        #     D = np.clip(D, -1.0, 1.0)  # Ensure in valid range for acos
+            
+        #     # Knee joint
+        #     theta3 = atan2(sqrt(1 - D**2), D)
+            
+        #     # Thigh joint
+        #     theta2 = atan2(z, G) - atan2(self.l4 * sin(theta3), 
+        #                                 self.l3 + self.l4 * cos(theta3))
+
+        #     # Account for joint direction conventions
+        #     theta3 = -theta3  # Knee joint moves in opposite direction
+            
+        #     # Add to joint angles list
+        #     angles.extend([theta1, theta2, theta3])
+       
+        # # Return joint angles in radians - FR, FL, RR, RL
+        # return angles
+
         for i in range(4):
+    
             x = positions[i][0]
             y = positions[i][1]
             z = positions[i][2]
 
-            # Leg-specific sign for hip joint (depends on which side the leg is on)
-            leg_sign = (-1)**((i % 2) == 1)  # -1 for FL, RL; +1 for FR, RR
-            
-            # Compute hip joint angle (abduction/adduction)
+            print(x, y, z)
+
             F = sqrt(x**2 + y**2 - self.l2**2)
             G = F - self.l1
             H = sqrt(G**2 + z**2)
-            
-            # Hip joint (abduction/adduction)
-            theta1 = -atan2(y, x) - atan2(F, self.l2 * leg_sign)
- 
-            # For the knee, compute angle using law of cosines
-            D = (H**2 - self.l3**2 - self.l4**2) / (2 * self.l3 * self.l4)
-            D = np.clip(D, -1.0, 1.0)  # Ensure in valid range for acos
-            
-            # Knee joint
-            theta3 = atan2(sqrt(1 - D**2), D)
-            
-            # Thigh joint
-            theta2 = atan2(z, G) - atan2(self.l4 * sin(theta3), 
-                                        self.l3 + self.l4 * cos(theta3))
 
-            # Account for joint direction conventions
-            theta3 = -theta3  # Knee joint moves in opposite direction
-            
-            # Add to joint angles list
-            angles.extend([theta1, theta2, theta3])
+            theta1 = -atan2(y,x) - atan2(F,self.l2 * (-1)**i)
+ 
+            D = (H**2 - self.l3**2 - self.l4**2)/(2*self.l3*self.l4)
+
+            theta4 = -atan2((sqrt(1-D**2)),D)
+
+            theta3 = atan2(z,G) - atan2(self.l4*sin(theta4),
+                                          self.l3 + self.l4*cos(theta4))
+
+            angles.append(theta1)
+            angles.append(theta3)
+            angles.append(theta4)
        
         # Return joint angles in radians - FR, FL, RR, RL
         return angles

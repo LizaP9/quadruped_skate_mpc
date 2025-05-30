@@ -14,14 +14,14 @@ def run_tests():
     # Define standard foot positions for A1 in neutral stance
     # [FR, FL, RR, RL] - each is [x, y, z] in the world frame
     default_stance = np.array([
-        [0.1838, -0.147, -0.15],    # FR
-        [0.1838,  0.147, -0.15],    # FL
-        [-0.1838, -0.147, -0.15],   # RR
-        [-0.1838,  0.147, -0.15]    # RL
+        [0.1838, -0.147, 0.05],    # FR
+        [0.1838,  0.147, 0.05],    # FL
+        [-0.1838, -0.147, 0.05],   # RR
+        [-0.1838,  0.147, 0.05]    # RL
     ])
     
     # Default body position and orientation
-    default_pos = [0.0, 0.0, 0.3]
+    default_pos = [0.0, 0.1, 0.3]
     default_ori = [0.0, 0.0, 0.0]
     
     # Test cases
@@ -73,7 +73,62 @@ def run_tests():
             "feet_positions": default_stance,
             "position": [0.03, 0.03, 0.28],  # Shifted and lowered
             "orientation": [0.1, 0.1, 0.1]   # Combined rotation
-        }
+        },
+        {
+            "name": "on_skate",
+            "feet_positions": np.array([
+                [0.1838, -0.1, 0.1],    # FR
+                [0.1838,  0.1, 0.1],    # FL
+                [-0.1838, -0.1, 0.1],   # RR
+                [-0.1838,  0.1, 0.1]    # RL
+            ]),
+            "position": default_pos,  # Shifted and lowered
+            "orientation": default_ori  # Combined rotation
+        },
+        {
+            "name": "on_skate_rigth_back_shift",
+            "feet_positions": np.array([
+                [0.1838, -0.1, 0.1],    # FR
+                [0.1838,  0.1, 0.1],    # FL
+                [-0.1838, -0.1, 0.1],   # RR
+                [-0.1838,  0.1, 0.1]    # RL
+            ]),
+            "position": [-0.07, -0.05, 0.3],  # Shifted and lowered
+            "orientation": default_ori  # Combined rotation
+        },
+        {
+            "name": "on_skate_rigth_back_shift_left_leg_center",
+            "feet_positions": np.array([
+                [0.1838, -0.1, 0.1],    # FR
+                [0.1838,  0, 0.1],    # FL
+                [-0.1838, -0.1, 0.1],   # RR
+                [-0.1838,  0.1, 0.1]    # RL
+            ]),
+            "position": [-0.07, -0.05, 0.3],  # Shifted and lowered
+            "orientation": default_ori  # Combined rotation
+        },
+        {
+            "name": "on_skate_left_leg_center",
+            "feet_positions": np.array([
+                [0.1838, -0.1, 0.1],    # FR
+                [0.1838,  0, 0.1],    # FL
+                [-0.1838, -0.1, 0.1],   # RR
+                [-0.1838,  0.1, 0.1]    # RL
+            ]),
+            "position": default_pos,  # Shifted and lowered
+            "orientation": default_ori  # Combined rotation
+        },
+        {
+            "name": "on_skate_ready_to_go",
+            "feet_positions": np.array([
+                [0.1838, -0.2, 0.1],    # FR
+                [0.1838,  0, 0.1],    # FL
+                [-0.1838, -0.1, 0.1],   # RR
+                [-0.1838,  0.1, 0.1]    # RL
+            ]),
+            "position": default_pos,  # Shifted and lowered
+            "orientation": default_ori  # Combined rotation
+        },
     ]
     
     # Run tests and collect results

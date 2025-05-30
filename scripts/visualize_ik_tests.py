@@ -127,6 +127,9 @@ def load_test_pose(test_data):
     
     # Set the position state in MuJoCo
     data.qpos[:19] = pos_state
+
+
+    #model.dof_damping[:] = 1000 # PREVENT GRAVITY 
     
     # Update the physics simulation
     mj.mj_forward(model, data)
@@ -215,10 +218,10 @@ def main():
     while not glfw.window_should_close(window):
         time_prev = data.time
         
-        # if not paused:
-        #     # Run physics for a short period
-        #     while (data.time - time_prev < 1.0/60.0):
-        #         mj.mj_step(model, data)
+        if not paused:
+            # Run physics for a short period
+            while (data.time - time_prev < 1.0/60.0):
+                mj.mj_step(model, data)
         
         # Render scene
         viewport_width, viewport_height = glfw.get_framebuffer_size(window)
