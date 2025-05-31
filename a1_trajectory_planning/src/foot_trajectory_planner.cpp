@@ -7,7 +7,7 @@ FootTrajectoryPlanner::FootTrajectoryPlanner()
         "/a1/fsm", 10,
         std::bind(&FootTrajectoryPlanner::fsmCallback, this, std::placeholders::_1));
 
-    foot_pub_ = this->create_publisher<quadruped_skate_mpc::msg::FootPosition>(
+    foot_pub_ = this->create_publisher<a1_msgs::msg::FootPosition>(
         "/a1/foot_des_positions", 10); 
 
 
@@ -35,7 +35,7 @@ void FootTrajectoryPlanner::fsmCallback(const std_msgs::msg::String::SharedPtr m
 
 void FootTrajectoryPlanner::publishFootTrajectory()
 {
-    quadruped_skate_mpc::msg::FootPosition foot_msg;
+    a1_msgs::msg::FootPosition foot_msg;
     foot_msg.header.stamp = this->now();
     foot_msg.header.frame_id = "trunk";
 

@@ -3,7 +3,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "geometry_msgs/msg/point_stamped.hpp"
-#include "quadruped_skate_mpc/msg/foot_position.hpp"
+#include "a1_msgs/msg/foot_position.hpp"
 
 
 
@@ -23,6 +23,6 @@ private:
 
 
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr fsm_sub_;
-    rclcpp::Publisher<quadruped_skate_mpc::msg::FootPosition>::SharedPtr foot_pub_;
+    rclcpp::Publisher<a1_msgs::msg::FootPosition>::SharedPtr foot_pub_;
     rclcpp::TimerBase::SharedPtr timer_;
 };
