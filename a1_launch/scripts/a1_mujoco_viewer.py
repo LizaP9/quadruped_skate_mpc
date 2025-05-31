@@ -6,8 +6,9 @@ import os
 
 import rclpy
 from rclpy.node import Node
-from quadruped_skate_mpc.msg import States
+from a1_msgs.msg import States
 from geometry_msgs.msg import Pose, Twist
+from ament_index_python.packages import get_package_share_directory
 
 
 rclpy.init()
@@ -105,9 +106,8 @@ def scroll(window, xoffset, yoffset):
     
 
 # Path to scene.xml
-pkg_path = os.path.dirname(__file__)
-scene_path = os.path.join(pkg_path, "../a1_description/scene.xml")
-scene_path = os.path.abspath(scene_path)
+a1_description_path = get_package_share_directory('a1_description')
+scene_path = os.path.join(a1_description_path, 'scene.xml')
 
 if not os.path.exists(scene_path):
     raise FileNotFoundError(f"Scene file not found: {scene_path}")

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This repository contains a ROS2 control package for a Unitree A1 quadruped robot with skates in MuJoCo simulation. The project focuses on foot trajectory planning and control for a quadruped robot on skates.
+This repository contains a modular ROS2 workspace for a Unitree A1 quadruped robot with skates in MuJoCo simulation. The project is organized into separate packages for robot description, inverse kinematics, trajectory planning, and simulation launch.
 
 ## Build and Run Commands
 
@@ -25,7 +25,7 @@ source install/setup.bash
 
 ```bash
 # Launch the MuJoCo simulation with Unitree A1
-ros2 launch quadruped_skate_mpc a1_mujoco.launch.py
+ros2 launch a1_launch a1_mujoco.launch.py
 ```
 
 ### Publishing Test Commands
@@ -35,19 +35,35 @@ ros2 launch quadruped_skate_mpc a1_mujoco.launch.py
 ros2 topic pub /a1/fsm std_msgs/msg/String '{data: "PREPARE_PUSH"}'
 ```
 
-## Code Architecture
+## Package Structure
 
-### Key Components
+The workspace is organized into the following ROS2 packages:
 
-1. **FootTrajectoryPlanner Node**: The main control node that plans foot trajectories for the robot based on the current FSM state.
-   - Subscribes to `/a1/fsm` topic for state changes
-   - Publishes to `/a1/foot_des_positions` with desired foot positions
-   - Implements Bezier curves for smooth trajectory planning
+### 1. **a1_description**
+- Contains robot description files (URDF/XML)
+- Mesh files and visual assets
+- MuJoCo scene files (scene.xml, skate.xml)
 
-2. **MuJoCo Simulation**: Runs a physics simulation of the A1 robot with skates
-   - Visualizes the robot in MuJoCo environment
-   - Publishes robot state information on ROS2 topics
-   - Handles control inputs for robot movement
+### 2. **a1_msgs**
+- Custom message definitions
+- `States.msg`: Joint positions, velocities, torques, IMU data, and force sensor readings
+- `FootPosition.msg`: Desired positions for all four feet (fr, fl, rr, rl)
+
+### 3. **a1_inverse_kinematics**
+- Inverse kinematics algorithms and utilities
+- Python scripts for IK computations
+- Test files and visualization tools
+
+### 4. **a1_trajectory_planning**
+- FootTrajectoryPlanner Node: Plans foot trajectories based on FSM state
+- Subscribes to `/a1/fsm` topic for state changes
+- Publishes to `/a1/foot_des_positions` with desired foot positions
+- Implements Bezier curves for smooth trajectory planning
+
+### 5. **a1_launch**
+- Launch files for simulation and control
+- MuJoCo viewer script
+- Orchestrates the complete system startup
 
 ### State Machine
 

@@ -12,10 +12,15 @@ WORKDIR /home/ros2_ws
 RUN python3 -m venv venv \
     && . venv/bin/activate \ 
     && pip install mujoco \
+    && pip install 'empy<4.0' \
+    && pip install Cython \
+    && pip install catkin_pkg \
+    && pip install lark \
     && echo "source /home/ros2_ws/venv/bin/activate" >> ~/.bashrc
 
-COPY . /home/ros2_ws/src/quadruped_skate_mpc
+COPY . /home/ros2_ws/src/
 
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build"
-RUN echo "source /home/ros2_ws/install/setup.bash" >> ~/.bashrc
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash"
+# RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --packages-skip a1_trajectory_planning"
+# RUN echo "source /home/ros2_ws/install/setup.bash" >> ~/.bashrc
 
