@@ -21,7 +21,7 @@ def run_tests():
     ])
     
     # Default body position and orientation
-    default_pos = [0.0, 0.1, 0.3]
+    default_pos = [0.0, 0.0, 0.3]
     default_ori = [0.0, 0.0, 0.0]
     
     # Test cases

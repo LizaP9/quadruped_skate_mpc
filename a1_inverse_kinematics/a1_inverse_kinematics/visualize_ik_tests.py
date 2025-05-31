@@ -177,7 +177,7 @@ def main():
     lasty = 0
     
     # Path to scene.xml
-    pkg_path = os.path.dirname(__file__)
+    pkg_path = os.path.dirname(os.path.dirname(__file__))
     scene_path = os.path.join(pkg_path, "../a1_description/scene.xml")
     scene_path = os.path.abspath(scene_path)
     
