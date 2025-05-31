@@ -59,11 +59,11 @@
     <texture type="2d" name="trunk_A1" file="trunk_A1.png"/>
     <material name="carbonfibre" texture="trunk_A1" specular="0" shininess="0.25"/>
 
-    <mesh class="a1" file="calf.obj"/>
-    <mesh class="a1" file="hip.obj"/>
-    <mesh class="a1" file="thigh.obj"/>
-    <mesh class="a1" file="thigh_mirror.obj"/>
-    <mesh class="a1" file="trunk.obj"/>
+    <mesh class="a1" file="assets/calf.obj"/>
+    <mesh class="a1" file="assets/hip.obj"/>
+    <mesh class="a1" file="assets/thigh.obj"/>
+    <mesh class="a1" file="assets/thigh_mirror.obj"/>
+    <mesh class="a1" file="assets/trunk.obj"/>
   </asset>
 
   <worldbody>
@@ -104,7 +104,7 @@
             <geom class="visual" mesh="calf"/>
             <geom class="calf1"/>
             <geom class="calf2"/>
-            <geom class="foot"/>
+            <geom name='FR_foot_geom' class="foot"/>
             <site name='FR_elbow' pos='0 0 0' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
             <site name='FR_foot' pos='0 0 -0.2' size='0.01' rgba="0 0 0 0"/> <!-- added-->
           </body>
@@ -134,7 +134,7 @@
             <geom class="visual" mesh="calf"/>
             <geom class="calf1"/>
             <geom class="calf2"/>
-            <geom class="foot"/>
+            <geom name='FL_foot_geom' class="foot"/>
             <site name='FL_elbow' pos='0 0 0' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
             <site name='FL_foot' pos='0 0 -0.2' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
           </body>
@@ -163,7 +163,7 @@
             <geom class="visual" mesh="calf"/>
             <geom class="calf1"/>
             <geom class="calf2"/>
-            <geom class="foot"/>
+            <geom name='RR_foot_geom' class="foot"/>
             <site name='RR_elbow' pos='0 0 0' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
             <site name='RR_foot' pos='0 0 -0.2' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
           </body>
@@ -192,7 +192,7 @@
             <geom class="visual" mesh="calf"/>
             <geom class="calf1"/>
             <geom class="calf2"/>
-            <geom class="foot"/>
+            <geom name='RL_foot_geom' class="foot"/>
             <site name='RL_elbow' pos='0 0 0' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
             <site name='RL_foot' pos='0 0 -0.2' quat='1 0 0 0' size='0.01' rgba="0 0 0 0"/> <!-- added-->
           </body>

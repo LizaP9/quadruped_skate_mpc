@@ -6,15 +6,16 @@ import os
 
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import JointState
+from a1_msgs.msg import States
 from geometry_msgs.msg import Pose, Twist
+from ament_index_python.packages import get_package_share_directory
 
 
 rclpy.init()
 node = rclpy.create_node('a1_sim_state_publisher')
 
-joint_pub = node.create_publisher(JointState, '/a1/joint_states', 10)
-com_pub = node.create_publisher(Pose, '/a1/com_pose', 10)
+joint_pub = node.create_publisher(States, '/a1/joint_act_states', 10)
+com_pub = node.create_publisher(Pose, '/a1/com_act_state', 10)
 
 
 
@@ -105,9 +106,8 @@ def scroll(window, xoffset, yoffset):
     
 
 # Path to scene.xml
-pkg_path = os.path.dirname(__file__)
-scene_path = os.path.join(pkg_path, "../a1_description/scene.xml")
-scene_path = os.path.abspath(scene_path)
+a1_description_path = get_package_share_directory('a1_description')
+scene_path = os.path.join(a1_description_path, 'scene.xml')
 
 if not os.path.exists(scene_path):
     raise FileNotFoundError(f"Scene file not found: {scene_path}")
@@ -143,20 +143,46 @@ init_controller(model,data)
 #set the controller
 mj.set_mjcb_control(controller)
 
-hip = 0
+hip_r = 0.0
+hip_l = 0.0
+
+# stance on skate
+# hip_r = 0.17
+# hip_l = -0.17
+
 pitch = 0.9
 knee = -1.8
 
-pos = np.array([0, 0, 0.3])
+pos = np.array([0, 0.0, 0.37])
 quat = np.array([1,0,0,0])
 #euler = np.array([0,0,np.pi/2])
 #quat = ram.bryant2quat(euler)
 
-qleg = np.array([hip,pitch,knee])
-data.qpos = np.concatenate((pos,quat,qleg,qleg,qleg,qleg))
+qleg_r = np.array([hip_r,pitch,knee])
+qleg_l = np.array([hip_l,pitch,knee])
+
+
+# position for a1 - first 19 elements
+data.qpos[:19] = np.concatenate((pos,quat,qleg_r,qleg_l,qleg_r,qleg_l))
 
 # ctrl = np.array([0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8, 0, 0.9, -1.8])
 
+
+# MuJoCo doesn't allow multiple .xml file, so you need to add everything in one .xml.
+# Thus, a1 + skate is consedered as one robot and have combines state and all of it's joints can be controller.
+#  In our case it's "scene.xml". The order to include a1.xml and skate.xml metter to understand the state
+
+# For a1 + skate:
+
+# State:
+# position 1x32 - a1 CoM linear position (3), a1 CoM quaternion (4), a1 joints (motors) (12), 
+# skate CoM linear position (3), skate CoM quaternion (4), skate joints (6)
+
+# velocity 1x30 - a1 CoM linear vel (3), a1 angular vel (3), a1 joint vel (motors) (12), 
+# skate CoM linear vel (3), skate angular vel (3), skate joint vel (6)
+
+
+# control - 1x32 - same as position state for position control
 
 while not glfw.window_should_close(window):
     time_prev = data.time
@@ -165,20 +191,46 @@ while not glfw.window_should_close(window):
     while (data.time - time_prev < 1.0/15.0):
         # mj.mj_step1(model, data)
         # Обновление состояний
-        q_act = data.qpos[7:].copy()
-        v_act = data.qvel[6:].copy()
+        q_act = data.qpos[7:19].copy()
+        v_act = data.qvel[6:18].copy()
         pos_quat_trunk = data.qpos[:7].copy()
         vel_angvel_trunk = data.qvel[:6].copy()
 
-        # JointState msg
-        js = JointState()
-        js.header.stamp = node.get_clock().now().to_msg()
-        js.name = [f"{leg}_{joint}" for leg in ["FR", "FL", "RR", "RL"] for joint in ["hip", "thigh", "calf"]]
-        js.position = q_act.tolist()
-        js.velocity = v_act.tolist()
+        # a1 JointState msg
+        js = States()
+
+        js.t = data.time 
+        js.qj = q_act.tolist()
+        js.vj = v_act.tolist()
+        js.tauj = data.ctrl[:12].tolist()
+        # js.tauj = [0.0] * 12
+
+        # quaternion
+        js.imu_orientation = data.qpos[3:7].tolist()
+        js.imu_angular_velocity = data.qvel[3:6].tolist()
+        js.imu_linear_acceleration = data.qacc[:3].tolist()  # или [0,0,0] если нет акселерометра
+
+
+        foot_force_sensor = [0.0, 0.0, 0.0, 0.0]
+
+        foot_geom_names = ['FR_foot_geom', 'FL_foot_geom', 'RR_foot_geom', 'RL_foot_geom']
+        foot_geom_ids = [mj.mj_name2id(model, mj.mjtObj.mjOBJ_GEOM, geom_name) for geom_name in foot_geom_names]
+
+        for i in range(data.ncon):
+            contact = data.contact[i]
+            force = np.zeros(6)
+            mj.mj_contactForce(model, data, i, force)
+            
+            # Check if contact involves any foot
+            for j, geom_id in enumerate(foot_geom_ids):
+                if contact.geom1 == geom_id or contact.geom2 == geom_id:
+                    # Use the magnitude of the normal force (z-component)
+                    foot_force_sensor[j] = np.linalg.norm(force[:3])
+        
+        js.foot_force_sensor = foot_force_sensor
         joint_pub.publish(js)
 
-        # CoM Pose msg
+        # a1 CoM Pose msg
         pose = Pose()
         pose.position.x = pos_quat_trunk[0]
         pose.position.y = pos_quat_trunk[1]
