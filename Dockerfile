@@ -20,7 +20,6 @@ RUN python3 -m venv venv \
 
 COPY . /home/ros2_ws/src/
 
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash"
-# RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --packages-skip a1_trajectory_planning"
-# RUN echo "source /home/ros2_ws/install/setup.bash" >> ~/.bashrc
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build"
+RUN echo "source /home/ros2_ws/install/setup.bash" >> ~/.bashrc
 

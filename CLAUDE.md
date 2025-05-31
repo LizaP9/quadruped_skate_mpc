@@ -54,11 +54,12 @@ The workspace is organized into the following ROS2 packages:
 - Python scripts for IK computations
 - Test files and visualization tools
 
-### 4. **a1_trajectory_planning**
+### 4. **a1_trajectory_planning** (C++)
 - FootTrajectoryPlanner Node: Plans foot trajectories based on FSM state
 - Subscribes to `/a1/fsm` topic for state changes
 - Publishes to `/a1/foot_des_positions` with desired foot positions
 - Implements Bezier curves for smooth trajectory planning
+- C++ implementation for performance-critical trajectory computations
 
 ### 5. **a1_launch**
 - Launch files for simulation and control
